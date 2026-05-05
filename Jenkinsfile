@@ -2,9 +2,9 @@ pipeline {
     agent {
         docker {
             // image 'node:16-buster-slim': Parameter image ini mengunduh Docker image bernama node:16-buster-slim dan menjalankan image sebagai container terpisah. 
-            // - Anda akan memiliki Jenkins container dan Node container terpisah yang berjalan secara lokal di Docker. 
+            // - Anda akan memiliki Jenkins container dan Node container terpisah yang berjalan secara lokal di Docker. 
             // - Node container menjadi agent yang digunakan Jenkins untuk menjalankan Pipeline project Anda. Namun, container ini hanya akan berjalan selama durasi eksekusi Pipeline Anda saja.
-            // - args '-p 3000:3000': Parameter args ini membuat Node container ini dapat diakses (sementara) melalui port 3000. Ini penting untuk menjalankan berkas jenkins/scripts/deliver.sh. 
+            // - args '-p 3000:3000': Parameter args ini membuat Node container ini dapat diakses (sementara) melalui port 3000. Ini penting untuk menjalankan berkas jenkins/scripts/deliver.sh. 
             image 'node:16-buster-slim'
             args '-p 3000:3000'
         }
@@ -24,6 +24,13 @@ pipeline {
         stage('Test') {
             steps {
                 sh './jenkins/scripts/test.sh'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh './jenkins/scripts/deliver.sh'
+                input message: 'Sudah selesai menggunakan React App? (Klik "Proceed" untuk mengakhiri)'
+                sh './jenkins/scripts/kill.sh'
             }
         }
     }
